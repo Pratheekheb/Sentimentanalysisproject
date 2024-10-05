@@ -1,17 +1,15 @@
-# Use the official Python image from the Docker Hub
-FROM python:3.9-slim
+# Use the official Python image as a base
+FROM python:3.9
 
 # Set the working directory
 WORKDIR /app
 
-# Copy the requirements.txt file into the container
-COPY requirements.txt .
-
-# Install the dependencies
+# Copy the requirements file and install dependencies
+COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the rest of your application code into the container
+# Copy the rest of the application code
 COPY . .
 
-# Command to run your Python script
-CMD ["python", "model.py"]  # replace 'model.py' with your actual script
+# Command to run your application (optional)
+CMD ["python", "model.py"]
