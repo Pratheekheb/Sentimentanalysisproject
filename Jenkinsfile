@@ -1,5 +1,17 @@
 pipeline {
-    agent any
+    agent {
+        // Specify the Docker agent label
+        docker {
+            image 'python:3.9' // Replace with your desired base image
+            label 'docker' // The label of the agent that has Docker installed
+        }
+    }
+
+    environment {
+        DOCKER_CREDENTIALS_ID = 'manjunath.chavan2017@gmail.com' // Set this to your Docker registry credentials ID
+        DOCKER_IMAGE = 'Python-Eduflix' // Set the desired image name
+        DOCKER_REGISTRY_URL = 'https://index.docker.io/v1/' // Replace with your Docker registry URL
+    }
 
     stages {
         stage('Checkout SCM') {
@@ -12,7 +24,7 @@ pipeline {
             steps {
                 script {
                     // Build the Docker image
-                    def image = docker.build('your-docker-image-name')
+                    def image = docker.build("${DOCKER_IMAGE}", "-f Dockerfile .")
                 }
             }
         }
@@ -21,10 +33,9 @@ pipeline {
             steps {
                 script {
                     // Run the Docker container and execute model.py
-                    docker.image('your-docker-image-name').inside {
-                        // Use 'python' to execute model.py
-                        bat 'python model.py' // Use 'bat' for Windows
-                        // For Linux, you would use 'sh' instead of 'bat'
+                    docker.image("${DOCKER_IMAGE}").inside {
+                        sh 'python model.py' // Use 'sh' for Unix-based systems
+                        // bat 'python model.py' // Use this for Windows
                     }
                 }
             }
