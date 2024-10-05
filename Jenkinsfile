@@ -1,6 +1,11 @@
 pipeline {
     agent any
 
+    environment {
+        IMAGE_NAME = 'sentiment-analysis-image'
+        CONTAINER_NAME = 'sentiment-analysis-container'
+    }
+
     stages {
         stage('Checkout SCM') {
             steps {
@@ -11,8 +16,21 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
+                    // Create a Dockerfile
+                    writeFile file: 'Dockerfile', text: '''
+                    FROM python:3.9-slim
+
+                    WORKDIR /app
+
+                    COPY requirements.txt .
+                    RUN pip install --no-cache-dir -r requirements.txt
+
+                    COPY . .
+
+                    CMD ["python", "model.py"]
+                    '''
                     // Build the Docker image
-                    def image = docker.build("sentiment-analysis:latest")
+                    sh "docker build -t ${IMAGE_NAME} ."
                 }
             }
         }
@@ -21,10 +39,7 @@ pipeline {
             steps {
                 script {
                     // Run the Docker container
-                    docker.image("sentiment-analysis:latest").inside {
-                        // The container will run the CMD specified in the Dockerfile
-                        sh 'python model.py'  // This line may be optional based on CMD in Dockerfile
-                    }
+                    sh "docker run --name ${CONTAINER_NAME} --rm ${IMAGE_NAME}"
                 }
             }
         }
