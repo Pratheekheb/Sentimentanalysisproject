@@ -1,16 +1,10 @@
 pipeline {
     agent any
 
-    environment {
-        GIT_REPO = 'https://github.com/Pratheekheb/Sentimentanalysisproject.git'
-        GIT_BRANCH = 'main'
-        GIT_CREDENTIALS_ID = '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'
-    }
-
     stages {
-        stage('Checkout') {
+        stage('Checkout SCM') {
             steps {
-                git branch: "${GIT_BRANCH}", url: "${GIT_REPO}", credentialsId: "${GIT_CREDENTIALS_ID}"
+                checkout scm
             }
         }
 
@@ -19,10 +13,12 @@ pipeline {
                 script {
                     if (isUnix()) {
                         sh 'python3 -m venv venv'
-                        sh 'source venv/bin/activate && pip install -r requirements.txt'
+                        sh '. venv/bin/activate'
+                        sh 'pip install -r requirements.txt'
                     } else {
                         bat 'python -m venv venv'
-                        bat 'call venv\\Scripts\\activate && pip install -r requirements.txt'
+                        bat 'venv\\Scripts\\activate.bat'
+                        bat 'venv\\Scripts\\pip install -r requirements.txt'
                     }
                 }
             }
@@ -32,9 +28,9 @@ pipeline {
             steps {
                 script {
                     if (isUnix()) {
-                        sh 'python app.py'
+                        sh 'python3 model.py' // replace with your actual script
                     } else {
-                        bat 'python app.py'
+                        bat 'python model.py' // replace with your actual script
                     }
                 }
             }
