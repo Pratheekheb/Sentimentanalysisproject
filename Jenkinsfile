@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        GIT_REPO = 'https://github.com/thegrandaviator/Project-3-EXL-Training-Batch1'
+        GIT_REPO = 'https://github.com/Pratheekheb/Sentimentanalysisproject.git'
         GIT_BRANCH = 'main'
         GIT_CREDENTIALS_ID = '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'
     }
