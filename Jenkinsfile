@@ -8,29 +8,22 @@ pipeline {
             }
         }
 
-        stage('Install Dependencies') {
+        stage('Build Docker Image') {
             steps {
                 script {
-                    if (isUnix()) {
-                        sh 'python3 -m venv venv'
-                        sh '. venv/bin/activate'
-                        sh 'pip install -r requirements.txt'
-                    } else {
-                        bat 'python -m venv venv'
-                        bat 'venv\\Scripts\\activate.bat'
-                        bat 'venv\\Scripts\\pip install -r requirements.txt'
-                    }
+                    // Build the Docker image
+                    def image = docker.build("sentiment-analysis:latest")
                 }
             }
         }
 
-        stage('Run Script') {
+        stage('Run Docker Container') {
             steps {
                 script {
-                    if (isUnix()) {
-                        sh 'python3 model.py' // replace with your actual script
-                    } else {
-                        bat 'python model.py' // replace with your actual script
+                    // Run the Docker container
+                    docker.image("sentiment-analysis:latest").inside {
+                        // The container will run the CMD specified in the Dockerfile
+                        sh 'python model.py'  // This line may be optional based on CMD in Dockerfile
                     }
                 }
             }
