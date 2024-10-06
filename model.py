@@ -15,7 +15,7 @@ from sklearn.ensemble import VotingClassifier
 import pickle
 
 # Load the dataset
-IMDB_data = pd.read_csv("C:\Sentiment_Analysis2\IMDB Dataset.csv")  # Replace with the correct path to your dataset
+IMDB_data = pd.read_csv("E:\Sentiment_Analysis2\IMDB Dataset.csv")  # Replace with the correct path to your dataset
 
 # Preprocessing functions
 nltk.download("stopwords")
