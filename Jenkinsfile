@@ -1,4 +1,4 @@
-pipeline {
+pipeline {  
     agent any
     environment {
         CONDA_ENV = 'sentiment_env'
