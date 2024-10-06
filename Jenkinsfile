@@ -1,41 +1,42 @@
 pipeline {
-    agent {
-        // Specify the Docker agent label
-        docker {
-            image 'python:3.9' // Replace with your desired base image
-            label 'docker' // The label of the agent that has Docker installed
-        }
-    }
+    agent any
 
     environment {
-        DOCKER_CREDENTIALS_ID = 'manjunath.chavan2017@gmail.com' // Set this to your Docker registry credentials ID
-        DOCKER_IMAGE = 'Python-Eduflix' // Set the desired image name
-        DOCKER_REGISTRY_URL = 'https://index.docker.io/v1/' // Replace with your Docker registry URL
+        GIT_REPO = 'https://github.com/yourusername/yourrepository.git'
+        GIT_BRANCH = 'main'
+        GIT_CREDENTIALS_ID = 'your-git-credentials-id'
     }
 
     stages {
-        stage('Checkout SCM') {
+        stage('Checkout') {
             steps {
-                checkout scm
+                git branch: "${GIT_BRANCH}", url: "${GIT_REPO}", credentialsId: "${GIT_CREDENTIALS_ID}"
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Install Dependencies') {
             steps {
                 script {
-                    // Build the Docker image
-                    def image = docker.build("${DOCKER_IMAGE}", "-f Dockerfile .")
+                    if (isUnix()) {
+                        sh 'python3 -m venv venv'
+                        sh '. venv/bin/activate'
+                        sh 'pip install -r requirements.txt'
+                    } else {
+                        bat 'python -m venv venv'
+                        bat 'venv\\Scripts\\activate'
+                        bat 'pip install -r requirements.txt'
+                    }
                 }
             }
         }
 
-        stage('Run Docker Container') {
+        stage('Run Script') {
             steps {
                 script {
-                    // Run the Docker container and execute model.py
-                    docker.image("${DOCKER_IMAGE}").inside {
-                        sh 'python model.py' // Use 'sh' for Unix-based systems
-                        // bat 'python model.py' // Use this for Windows
+                    if (isUnix()) {
+                        sh 'python model.py'
+                    } else {
+                        bat 'python model.py'
                     }
                 }
             }
@@ -44,7 +45,7 @@ pipeline {
 
     post {
         always {
-            cleanWs() // Clean workspace after build
+            cleanWs()
         }
     }
 }
