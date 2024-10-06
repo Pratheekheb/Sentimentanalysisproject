@@ -2,9 +2,9 @@ pipeline {
     agent any
 
     environment {
-        GIT_REPO = 'https://github.com/yourusername/yourrepository.git'
+        GIT_REPO = 'https://github.com/Pratheekheb/Sentimentanalysisproject.git'
         GIT_BRANCH = 'main'
-        GIT_CREDENTIALS_ID = 'your-git-credentials-id'
+        GIT_CREDENTIALS_ID = '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'
     }
 
     stages {
