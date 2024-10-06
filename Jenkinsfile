@@ -1,60 +1,48 @@
 pipeline {
     agent any
-
-    environment {
-        GIT_REPO = 'https://github.com/Pratheekheb/Sentimentanalysisproject.git'
-        GIT_BRANCH = 'main'
-        GIT_CREDENTIALS_ID = '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'
-    }
-
     stages {
-        stage('Checkout') {
+        stage('Checkout SCM') {
             steps {
-                git branch: "${GIT_BRANCH}", url: "${GIT_REPO}", credentialsId: "${GIT_CREDENTIALS_ID}"
+                checkout([$class: 'GitSCM', branches: [[name: '*/main']], 
+                    userRemoteConfigs: [[url: 'https://github.com/Pratheekheb/Sentimentanalysisproject.git', credentialsId: '5f06b98e-537d-4c25-bef5-be1a4bfd66ac']]])
             }
         }
-
         stage('Install Dependencies') {
             steps {
                 script {
-                    if (isUnix()) {
-                        sh '''
-                            conda create -n sentiment_env python=3.8 -y
-                            source activate sentiment_env
-                            pip install -r requirements.txt
-                        '''
-                    } else {
-                        bat '''
-                            conda create -n sentiment_env python=3.8 -y
-                            conda activate sentiment_env
-                            pip install -r requirements.txt
-                        '''
-                    }
+                    // Create and set up the Conda environment
+                    bat 'conda create -n sentiment_env python=3.8 -y'
                 }
             }
         }
-
-        stage('Run Script') {
+        stage('Activate Environment') {
             steps {
                 script {
-                    if (isUnix()) {
-                        sh '''
-                            source activate sentiment_env
-                            python model.py
-                        '''
-                    } else {
-                        bat '''
-                            conda activate sentiment_env
-                            python model.py
-                        '''
-                    }
+                    // Activate the environment
+                    bat 'conda activate sentiment_env'
+                }
+            }
+        }
+        stage('Install Required Packages') {
+            steps {
+                script {
+                    // Install the required dependencies from requirements.txt (if applicable)
+                    bat 'conda activate sentiment_env && pip install -r requirements.txt'
+                }
+            }
+        }
+        stage('Run Sentiment Analysis Model') {
+            steps {
+                script {
+                    // Run the model.py script within the activated conda environment
+                    bat 'conda activate sentiment_env && python model.py'
                 }
             }
         }
     }
-
     post {
         always {
+            // Clean up the workspace after the build
             cleanWs()
         }
     }
