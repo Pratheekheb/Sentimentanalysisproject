@@ -4,7 +4,7 @@ pipeline {
     environment {
         GIT_REPO = 'https://github.com/Pratheekheb/Sentimentanalysisproject.git'
         GIT_BRANCH = 'main'
-        GIT_CREDENTIALS_ID = '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'  // Update this to the ID of your Jenkins-stored GitHub token credentials
+        GIT_CREDENTIALS_ID = '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'
     }
 
     stages {
@@ -19,14 +19,14 @@ pipeline {
                 script {
                     if (isUnix()) {
                         sh '''
-                            python3 -m venv venv
-                            . venv/bin/activate
+                            conda create -n sentiment_env python=3.8 -y
+                            source activate sentiment_env
                             pip install -r requirements.txt
                         '''
                     } else {
                         bat '''
-                            python -m venv venv
-                            venv\\Scripts\\activate
+                            conda create -n sentiment_env python=3.8 -y
+                            conda activate sentiment_env
                             pip install -r requirements.txt
                         '''
                     }
@@ -39,12 +39,12 @@ pipeline {
                 script {
                     if (isUnix()) {
                         sh '''
-                            . venv/bin/activate
+                            source activate sentiment_env
                             python model.py
                         '''
                     } else {
                         bat '''
-                            venv\\Scripts\\activate
+                            conda activate sentiment_env
                             python model.py
                         '''
                     }
